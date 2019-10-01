@@ -30,6 +30,10 @@ public class ParameterAlignment extends AbstractCheck {
     @Override
     public void visitToken(DetailAST ast) {
         if (ast.getType() == TokenTypes.ELIST && ast.getChildCount() > 0) {
+            if (ast.getParent().getType() == TokenTypes.FOR_ITERATOR) {
+                return;
+            }
+
             DetailAST parent = ast.getParent();
             DetailAST lparen = isParentMethodCall(ast) ? parent : parent.findFirstToken(TokenTypes.LPAREN);
             DetailAST rparen = getLastChild(ast.getParent());

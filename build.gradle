@@ -36,8 +36,8 @@ publishing {
 
     publications {
         mavenJava(MavenPublication) {
-            groupId = group
-            artifactId = "checkstyle-checks"
+            groupId = project.group
+            artifactId = project.name
 
             pom {
                 name = 'Checkstyle Checks'
