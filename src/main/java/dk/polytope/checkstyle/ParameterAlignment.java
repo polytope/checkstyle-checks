@@ -29,17 +29,23 @@ public class ParameterAlignment extends AbstractCheck {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (ast.getType() == TokenTypes.ELIST && ast.getChildCount() > 0) {
-            if (ast.getParent().getType() == TokenTypes.FOR_ITERATOR) {
+        if (ast.getType() == TokenTypes.ELIST) {
+            if (ast.getChildCount() == 0 || ast.getParent().getType() == TokenTypes.FOR_ITERATOR) {
                 return;
             }
 
             DetailAST parent = ast.getParent();
             DetailAST lparen = isParentMethodCall(ast) ? parent : parent.findFirstToken(TokenTypes.LPAREN);
-            DetailAST rparen = getLastChild(ast.getParent());
+            DetailAST rparen = ast.getParent().getLastChild();
 
             checkRule(lparen, ast, rparen);
-        } else if (ast.branchContains(TokenTypes.PARAMETER_DEF)) {
+        } else {
+            DetailAST params = ast.findFirstToken(TokenTypes.PARAMETERS);
+
+            if (params != null && params.getChildCount() == 0) {
+                return;
+            }
+
             DetailAST lparen = ast.findFirstToken(TokenTypes.LPAREN);
             DetailAST rparen = getRightParenthesis(lparen);
 
@@ -51,25 +57,25 @@ public class ParameterAlignment extends AbstractCheck {
         return ast.getParent().getType() == TokenTypes.METHOD_CALL;
     }
 
-    private void checkRule(DetailAST lparen, DetailAST params, DetailAST rparen) {
-        DetailAST lastParam = getLastChild(params);
-        boolean sameLine = params.getLineNo() == lparen.getLineNo();
+    private void checkRule(DetailAST leftParenthesis, DetailAST params, DetailAST rightParenthesis) {
+        boolean leftParenthesisOnSameLineAsFirstParam = onSameLine(leftParenthesis, params.getFirstChild());
+        boolean rightParenthesisShareLineWithLastParam = shareLines(rightParenthesis, params.getLastChild());
 
-        if (sameLine && lparen.getLineNo() != rparen.getLineNo()) {
-            log(params.getLineNo(), SAME_LINE_NOT_COMPLIED);
-        } else if (!sameLine && lastParam.getLineNo() == rparen.getLineNo()) {
-            log(params.getLineNo(), LAST_PARAM_RIGHT_PAREN);
+        if (!onSameLine(leftParenthesis, rightParenthesis)) {
+            if (leftParenthesisOnSameLineAsFirstParam && rightParenthesisShareLineWithLastParam) {
+                log(params.getLineNo(), SAME_LINE_NOT_COMPLIED);
+            } else if (leftParenthesisOnSameLineAsFirstParam ^ rightParenthesisShareLineWithLastParam) {
+                log(params.getLineNo(), LAST_PARAM_RIGHT_PAREN);
+            }
         }
     }
 
-    private DetailAST getLastChild(DetailAST node) {
-        DetailAST lastChild = node.getFirstChild();
+    private boolean onSameLine(DetailAST ast1, DetailAST ast2) {
+        return ast1.getLineNo() == ast2.getLineNo();
+    }
 
-        while (lastChild != null && lastChild.getNextSibling() != null) {
-            lastChild = lastChild.getNextSibling();
-        }
-
-        return lastChild;
+    private boolean shareLines(DetailAST ast1, DetailAST ast2) {
+        return ast1.getLineNo() <= findLastLine(ast2) && findLastLine(ast1) >= ast2.getLineNo();
     }
 
     private DetailAST getRightParenthesis(DetailAST lparen) {
@@ -78,6 +84,17 @@ public class ParameterAlignment extends AbstractCheck {
         while (rparen.getType() != TokenTypes.RPAREN) {
             rparen = rparen.getNextSibling();
         }
+
         return rparen;
+    }
+
+    private int findLastLine(final DetailAST astNode) {
+        final int lastLine;
+        if (astNode.getChildCount() == 0) {
+            lastLine = astNode.getLineNo();
+        } else {
+            lastLine = findLastLine(astNode.getLastChild());
+        }
+        return lastLine;
     }
 }
