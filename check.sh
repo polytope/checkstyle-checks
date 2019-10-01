@@ -1,5 +1,7 @@
-./gradlew clean build jar && \
-java -classpath \
-  build/libs/checkstyle-checks-1.0-SNAPSHOT.jar:checkstyle-8.25-all.jar \
-  com.puppycrawl.tools.checkstyle.Main -c config.xml -d \
-  Test.java
+#!/bin/bash
+./gradlew clean build jar
+
+FILE="build/libs/checkstyle-checks-*.jar"
+
+java -classpath "$(echo $FILE)":checkstyle-8.25-all.jar \
+  com.puppycrawl.tools.checkstyle.Main -c config.xml -d Test.java
