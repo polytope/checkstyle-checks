@@ -5,8 +5,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class ParameterAlignment extends AbstractCheck {
-    private static final String SAME_LINE_NOT_COMPLIED = "same.line.not.complied";
-    private static final String LAST_PARAM_RIGHT_PAREN = "last.param.right.paren";
+    public static final String SAME_LINE_NOT_COMPLIED = "same.line.not.complied";
+    public static final String LAST_PARAM_RIGHT_PAREN = "last.param.right.paren";
 
     @Override
     public int[] getDefaultTokens() {
@@ -61,11 +61,13 @@ public class ParameterAlignment extends AbstractCheck {
         boolean leftParenthesisOnSameLineAsFirstParam = onSameLine(leftParenthesis, params.getFirstChild());
         boolean rightParenthesisShareLineWithLastParam = shareLines(rightParenthesis, params.getLastChild());
 
-        if (!onSameLine(leftParenthesis, rightParenthesis)) {
-            if (leftParenthesisOnSameLineAsFirstParam && rightParenthesisShareLineWithLastParam) {
-                log(params.getLineNo(), SAME_LINE_NOT_COMPLIED);
-            } else if (leftParenthesisOnSameLineAsFirstParam ^ rightParenthesisShareLineWithLastParam) {
-                log(params.getLineNo(), LAST_PARAM_RIGHT_PAREN);
+        if (!isOnlyOneParam(params) || !firstParamIsLambda(params)) {
+            if (!onSameLine(leftParenthesis, rightParenthesis)) {
+                if (leftParenthesisOnSameLineAsFirstParam && rightParenthesisShareLineWithLastParam) {
+                    log(params.getLineNo(), SAME_LINE_NOT_COMPLIED);
+                } else if (leftParenthesisOnSameLineAsFirstParam ^ rightParenthesisShareLineWithLastParam) {
+                    log(params.getLineNo(), LAST_PARAM_RIGHT_PAREN);
+                }
             }
         }
     }
@@ -96,5 +98,13 @@ public class ParameterAlignment extends AbstractCheck {
             lastLine = findLastLine(astNode.getLastChild());
         }
         return lastLine;
+    }
+
+    private boolean firstParamIsLambda(DetailAST params) {
+        return params.getFirstChild().getType() == TokenTypes.LAMBDA;
+    }
+
+    private boolean isOnlyOneParam(DetailAST params) {
+        return params.getChildCount() == 1;
     }
 }

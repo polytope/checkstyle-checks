@@ -1,0 +1,23 @@
+name: Java CI
+
+on: [push]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 14
+            -   name: Cache Gradle packages
+                uses: actions/cache@v2
+                with:
+                    path: ~/.gradle/caches
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+                    restore-keys: ${{ runner.os }}-gradle
+            -   name: Testing
+                run: ./gradlew test
+            -   name: Building and linting
+                run: ./gradlew build --exclude-task test
