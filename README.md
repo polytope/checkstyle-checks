@@ -1,5 +1,7 @@
 # Polytope's Checkstyle Extensions
 
+![Java CI](https://github.com/polytope/checkstyle-checks/workflows/Java%20CI/badge.svg)
+
 This repository is a collection of Checkstyle Checks which are used in Polytope's codebases.
 
 ## Checks
@@ -18,6 +20,9 @@ methodCall(
     b,
     c
 );
+methodCall2(a -> {
+    return b + c;
+});
 ```
 
 #### NOT OK
@@ -33,4 +38,10 @@ methodCall(
     a,
     b,
     c);
+methodCall2(
+    a,
+    b,
+    a -> {
+        return b + c;
+    });
 ```
