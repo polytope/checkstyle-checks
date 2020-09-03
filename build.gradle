@@ -1,16 +1,16 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id "eu.davidea.grabver" version "2.0.2"
 }
 
-apply from: 'https://raw.githubusercontent.com/passsy/gradle-GitVersioner/master/git-versioner.gradle'
-
-ext.gitVersioner = [
-        yearFactor: 1200,
-]
+versioning {
+    major 1
+    minor 0
+}
 
 group 'dk.polytope'
-version gitVersion.version
+version versioning.name
 
 sourceCompatibility = 1.8
 
@@ -18,7 +18,7 @@ jar {
     manifest {
         attributes(
                 'Implementation-Title': project.name,
-                'Implementation-Version': gitVersion.version
+                'Implementation-Version': versioning.name
         )
     }
 }
