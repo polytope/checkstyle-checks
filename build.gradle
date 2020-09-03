@@ -28,8 +28,8 @@ publishing {
         maven {
             url = uri("https://maven.pkg.github.com/polytope/checkstyle-checks")
             credentials {
-                username = System.getenv("GITHUB_MVN_USERNAME")
-                password = System.getenv("GITHUB_MVN_PUBLISH")
+                username = System.getenv("GITHUB_MVN_USERNAME") ?: System.getenv("MVN_USERNAME_GITHUB")
+                password = System.getenv("GITHUB_MVN_TOKEN") ?: System.getenv("MVN_TOKEN_GITHUB")
             }
         }
     }

@@ -61,7 +61,7 @@ public class ParameterAlignment extends AbstractCheck {
         boolean leftParenthesisOnSameLineAsFirstParam = onSameLine(leftParenthesis, params.getFirstChild());
         boolean rightParenthesisShareLineWithLastParam = shareLines(rightParenthesis, params.getLastChild());
 
-        if (!isOnlyOneParam(params) || !firstParamIsLambda(params)) {
+        if (!isOnlyOneParam(params)) {
             if (!onSameLine(leftParenthesis, rightParenthesis)) {
                 if (leftParenthesisOnSameLineAsFirstParam && rightParenthesisShareLineWithLastParam) {
                     log(params.getLineNo(), SAME_LINE_NOT_COMPLIED);
@@ -98,10 +98,6 @@ public class ParameterAlignment extends AbstractCheck {
             lastLine = findLastLine(astNode.getLastChild());
         }
         return lastLine;
-    }
-
-    private boolean firstParamIsLambda(DetailAST params) {
-        return params.getFirstChild().getType() == TokenTypes.LAMBDA;
     }
 
     private boolean isOnlyOneParam(DetailAST params) {

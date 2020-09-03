@@ -50,9 +50,9 @@ class ParameterAlignmentTest extends AbstractModuleTestSupport {
     }
 
     @Test
-    void succeedWhen_OnlyParamIsLambdaAndSpansMultipleLinesOnSameLineAsLeftAndRightParenthesis() throws Exception {
+    void succeedWhen_OnlyParamSpansMultipleLinesOnSameLineAsLeftAndRightParenthesis() throws Exception {
         DefaultConfiguration checkConfig = createModuleConfig(ParameterAlignment.class);
         String[] expected = {};
-        verify(checkConfig, getPath("OnlyParamIsLambdaAndSpansMultipleLinesOnSameLineAsLeftAndRightParenthesis.java"), expected);
+        verify(checkConfig, getPath("OnlyParamSpansMultipleLinesOnSameLineAsLeftAndRightParenthesis.java"), expected);
     }
 }
